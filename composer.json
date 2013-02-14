@@ -3,6 +3,7 @@
     "description":"Symfony2 bundle that can expose all services registered in your service container as JSON-RPC webservices",
     "keywords":["json", "rpc", "webservice", "symfony2bundle" ],
     "homepage":"http://github.com/wasinger/jsonrpc-bundle",
+    "license":"MIT",
     "authors":[
         {
             "name":"Christoph Singer",
