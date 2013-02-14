@@ -1,0 +1,23 @@
+{
+    "name":"wa72/jsonrpc-bundle",
+    "description":"Symfony2 bundle that can expose all services registered in your service container as JSON-RPC webservices",
+    "keywords":["json", "rpc", "webservice", "symfony2bundle" ],
+    "homepage":"http://github.com/wasinger/jsonrpc-bundle",
+    "authors":[
+        {
+            "name":"Christoph Singer",
+            "email":"singer@webagentur72.de",
+            "homepage":"http://www.webagentur72.de"
+        }
+    ],
+    "require":{
+        "php":">=5.3.1",
+        "symfony/symfony":">=2.1.0,<2.3-dev"
+    },
+    "autoload":{
+        "psr-0":{
+            "Wa72\\JsonRpcBundle":"src/"
+        }
+    }
+}
+

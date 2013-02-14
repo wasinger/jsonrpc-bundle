@@ -1,0 +1,3 @@
+wa72_json_rpc:
+    pattern: /
+    defaults: { _controller: wa72_jsonrpc.jsonrpccontroller:execute }

@@ -1,0 +1,8 @@
+parameters:
+    wa72_jsonrpc.jsonrpccontroller.class: Wa72\JsonRpcBundle\Controller\JsonRpcController
+
+services:
+    wa72_jsonrpc.jsonrpccontroller:
+        class: %wa72_jsonrpc.jsonrpccontroller.class%
+        arguments: [@service_container, %wa72.jsonrpc%]
+
