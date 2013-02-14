@@ -4,6 +4,7 @@
     "keywords":["json", "rpc", "webservice", "symfony2bundle" ],
     "homepage":"http://github.com/wasinger/jsonrpc-bundle",
     "license":"MIT",
+    "type": "symfony-bundle",
     "authors":[
         {
             "name":"Christoph Singer",
