@@ -18,6 +18,7 @@ Installation
 3. Import the bundle's route in your routing.yml:
 
 ```yaml
+# app/config/routing.yml
 wa72_json_rpc:
     resource: "@Wa72JsonRpcBundle/Resources/config/routing.yml"
     prefix:   /jsonrpc
@@ -34,14 +35,15 @@ The key of an entry of the "functions" array is the alias name for the method to
 "service" specifies the name of the service and "method" the name of the method to call. Example:
 
 ```yaml
+# app/config/config.yml
 wa72_json_rpc:
     functions:
         myfunction1:
             service: "mybundle.servicename"
             method: "methodofservice"
-	anotherfunction:
-	    service: "bundlename.foo"
-	    method: "bar"
+        anotherfunction:
+            service: "bundlename.foo"
+            method: "bar"
 ```
 
 In this example, "myfunction1" and "anotherfunction" are aliases for service methods that are used as JSON-RPC method names.
