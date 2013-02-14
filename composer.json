@@ -17,8 +17,9 @@
     },
     "autoload":{
         "psr-0":{
-            "Wa72\\JsonRpcBundle":"src/"
+            "Wa72\\JsonRpcBundle":""
         }
-    }
+    },
+    "target-dir": "Wa72/JsonRpcBundle"
 }
 
