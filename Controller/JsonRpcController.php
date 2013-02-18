@@ -56,9 +56,9 @@ class JsonRpcController extends ContainerAware
         $this->setContainer($container);
     }
 
-    public function execute()
+    public function execute(Request $httprequest)
     {
-        $json = file_get_contents('php://input');
+        $json = $httprequest->getContent();
         $request = json_decode($json);
         if ($request === null) {
             return $this->getErrorResponse(self::PARSE_ERROR, null);
@@ -103,13 +103,19 @@ class JsonRpcController extends ContainerAware
             $response = array('jsonrpc' => '2.0');
             $response['result'] = $result;
             $response['id'] = (isset($request->id) ? $request->id : null);
-            return new Response(json_encode($response), 200, array('Content-Type' => 'application/json'));
+
+            if ($this->container->has('jms_serializer')) {
+                $response = $this->container->get('jms_serializer')->serialize($response, 'json');
+            } else {
+                $response = json_encode($response);
+            }
+            return new Response($response, 200, array('Content-Type' => 'application/json'));
         } else {
             return $this->getErrorResponse(self::METHOD_NOT_FOUND, $request->id);
         }
     }
 
-    private function getError($code)
+    protected function getError($code)
     {
         $message = '';
         switch ($code) {
@@ -132,7 +138,7 @@ class JsonRpcController extends ContainerAware
         return array('code' => $code, 'message' => $message);
     }
 
-    private function getErrorResponse($code, $id, $data = null)
+    protected function getErrorResponse($code, $id, $data = null)
     {
         $response = array('jsonrpc' => '2.0');
         $response['error'] = $this->getError($code);
