@@ -91,7 +91,9 @@ class JsonRpcController extends ContainerAware
                         return $this->getErrorResponse(self::INVALID_PARAMS, $request->id,
                             sprintf('Parameter %s is missing', $name));
                     }
-                    $newparams[$i] = $params->$name;
+                    if(isset($params->$name)) {
+                        $newparams[$i] = $params->$name;
+                    }
                 }
                 $params = $newparams;
             }
