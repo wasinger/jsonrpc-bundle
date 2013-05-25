@@ -93,6 +93,8 @@ class JsonRpcController extends ContainerAware
                     }
                     if(isset($params->$name)) {
                         $newparams[$i] = $params->$name;
+                    } else {
+                        $newparams[$i] = null;
                     }
                 }
                 $params = $newparams;
