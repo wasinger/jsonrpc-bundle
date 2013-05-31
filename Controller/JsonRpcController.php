@@ -44,6 +44,7 @@ class JsonRpcController extends ContainerAware
     const INTERNAL_ERROR = -32603;
 
     private $config;
+    private $serializationContext;
 
     /**
      * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
@@ -109,7 +110,7 @@ class JsonRpcController extends ContainerAware
             $response['id'] = (isset($request->id) ? $request->id : null);
 
             if ($this->container->has('jms_serializer')) {
-                $response = $this->container->get('jms_serializer')->serialize($response, 'json');
+                $response = $this->container->get('jms_serializer')->serialize($response, 'json', $this->serializationContext);
             } else {
                 $response = json_encode($response);
             }
@@ -149,5 +150,10 @@ class JsonRpcController extends ContainerAware
         if ($data != null) $response['error']['data'] = $data;
         $response['id'] = $id;
         return new Response(json_encode($response), 200, array('Content-Type' => 'application/json'));
+    }
+
+    public function setSerializationContext($context)
+    {
+        $this->serializationContext = $context;
     }
 }
