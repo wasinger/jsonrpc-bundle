@@ -1,7 +1,7 @@
 {
     "name":"wa72/jsonrpc-bundle",
-    "description":"JSON-RPC server for Symfony2: exposes services registered in the service container as JSON-RPC-webservices",
-    "keywords":["json", "rpc", "webservice", "symfony2bundle" ],
+    "description":"JSON-RPC server for Symfony2: exposes services registered in the service container as JSON-RPC webservices",
+    "keywords":["json", "rpc", "jsonrpc", "json-rpc", "webservice", "symfony2bundle" ],
     "homepage":"http://github.com/wasinger/jsonrpc-bundle",
     "license":"MIT",
     "type": "symfony-bundle",
