@@ -43,7 +43,14 @@ class JsonRpcController extends ContainerAware
     const INVALID_PARAMS = -32602;
     const INTERNAL_ERROR = -32603;
 
+    /**
+     * @var array $config
+     */
     private $config;
+
+    /**
+     * @var \JMS\Serializer\SerializationContext
+     */
     private $serializationContext;
 
     /**
@@ -92,7 +99,7 @@ class JsonRpcController extends ContainerAware
                         return $this->getErrorResponse(self::INVALID_PARAMS, $request->id,
                             sprintf('Parameter %s is missing', $name));
                     }
-                    if(isset($params->$name)) {
+                    if (isset($params->$name)) {
                         $newparams[$i] = $params->$name;
                     } else {
                         $newparams[$i] = null;
@@ -152,6 +159,11 @@ class JsonRpcController extends ContainerAware
         return new Response(json_encode($response), 200, array('Content-Type' => 'application/json'));
     }
 
+    /**
+     * Set SerializationContext for using with jms_serializer
+     *
+     * @param \JMS\Serializer\SerializationContext $context
+     */
     public function setSerializationContext($context)
     {
         $this->serializationContext = $context;
