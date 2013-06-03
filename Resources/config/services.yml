@@ -1,8 +1,11 @@
 parameters:
     wa72_jsonrpc.jsonrpccontroller.class: Wa72\JsonRpcBundle\Controller\JsonRpcController
+    wa72_jsonrpc.testservice.class: Wa72\JsonRpcBundle\Tests\Testservice
 
 services:
     wa72_jsonrpc.jsonrpccontroller:
         class: %wa72_jsonrpc.jsonrpccontroller.class%
         arguments: [@service_container, %wa72.jsonrpc%]
 
+    wa72_jsonrpc.testservice:
+        class: %wa72_jsonrpc.testservice.class%
