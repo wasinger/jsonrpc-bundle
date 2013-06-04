@@ -77,7 +77,7 @@ curl -XPost http://your-symfony-project/jsonrpc/ -d '{"jsonrpc":"2.0","method":"
 and you should get the following answer:
 
 ```
-{"jsonrpc":"2.0","result":"Hello Joe!","id":"test"}
+{"jsonrpc":"2.0","result":"Hello Joe!","id":"foo"}
 ```
 
 There are also unit tests you can run using phpunit.
