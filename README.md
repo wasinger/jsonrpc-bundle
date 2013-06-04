@@ -5,7 +5,7 @@ JsonRpcBundle
 
 JsonRpcBundle is a bundle for Symfony 2.1 and up that allows to easily build a JSON-RPC server for web services using [JSON-RPC 2.0] (http://www.jsonrpc.org/specification).
 
-The bundle contains a controller that is able to expose any service method registered in the Symfony service container as a JSON-RPC web service. The return value of the service method is converted to JSON using jms_serializer, if available, and a simple json_encode() otherwise. 
+The bundle contains a controller that is able to expose methods of any service registered in the Symfony service container as a JSON-RPC web service. The return value of the service method is converted to JSON using [jms_serializer] (https://github.com/schmittjoh/JMSSerializerBundle), if this service is available, and json_encode() otherwise. 
 
 Of course, it doesn't simply expose all your services' methods to the public, but only those explicitely mentioned in the configuration. And service methods cannot be called by it's original name but by an alias to be defined in the configuration.
 
@@ -56,7 +56,7 @@ A method name "myfunction1" in the JSON-RPC call will then call the method "meth
 Testing
 -------
 
-The bundles comes with a test service. To see if it works add the following configuration to your config.yml:
+The bundle comes with a test service. To see if it works add the following configuration to your config.yml:
 
 ```yaml
 # app/config/config.yml
