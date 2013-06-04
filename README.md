@@ -3,11 +3,11 @@ JsonRpcBundle
 
 [![Build Status](https://secure.travis-ci.org/wasinger/jsonrpc-bundle.png?branch=master)](http://travis-ci.org/wasinger/jsonrpc-bundle)
 
-JsonRpcBundle is a bundle for Symfony 2.1 and up that allows you to easily build a JSON-RPC server for web services using [JSON-RPC 2.0] (http://www.jsonrpc.org/specification).
+JsonRpcBundle is a bundle for Symfony 2.1 and up that allows to easily build a JSON-RPC server for web services using [JSON-RPC 2.0] (http://www.jsonrpc.org/specification).
 
-The bundle contains a controller that is able to expose every service registered in your Symfony service container as a JSON-RPC web service.
+The bundle contains a controller that is able to expose any service method registered in the Symfony service container as a JSON-RPC web service. The return value of the service method is converted to JSON using jms_serializer, if available, and a simple json_encode() otherwise. 
 
-Of course, it doesn't simply expose all your services' methods to the public, but only those you have explicitely mentioned in your configuration. And service methods cannot be called by it's original name but only by an alias name to be defined in your configuration.
+Of course, it doesn't simply expose all your services' methods to the public, but only those explicitely mentioned in the configuration. And service methods cannot be called by it's original name but by an alias to be defined in the configuration.
 
 
 Installation
@@ -26,7 +26,7 @@ wa72_json_rpc:
     prefix:   /jsonrpc
 ```
 
-Your JSON-RPC web service will then be available in your project calling the /jsonrpc URL.
+Your JSON-RPC web service will then be available in your project calling the /jsonrpc/ URL.
 
 Configuration
 -------------
@@ -52,3 +52,32 @@ wa72_json_rpc:
 
 In this example, "myfunction1" and "anotherfunction" are aliases for service methods that are used as JSON-RPC method names.
 A method name "myfunction1" in the JSON-RPC call will then call the method "methodofservice" of service "mybundle.servicename".
+
+Testing
+-------
+
+The bundles comes with a test service. To see if it works add the following configuration to your config.yml:
+
+```yaml
+# app/config/config.yml
+wa72_json_rpc:
+    functions:
+        testhello:
+            service: "wa72_jsonrpc.testservice"
+            method: "hello"
+```
+
+If you have imported the bundle's routing to /jsonrpc (see above) you should then be able to test your service
+by sending a JSON-RPC request using curl:
+
+```bash
+curl -XPost http://your-symfony-project/jsonrpc/ -d '{"jsonrpc":"2.0","method":"testhello","id":"foo","params":{"name":"Joe"}}'
+```
+
+and you should get the following answer:
+
+```
+{"jsonrpc":"2.0","result":"Hello Joe!","id":"test"}
+```
+
+There are also unit tests you can run using phpunit.
