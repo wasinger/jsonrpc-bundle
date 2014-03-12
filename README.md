@@ -71,7 +71,7 @@ If you have imported the bundle's routing to /jsonrpc (see above) you should the
 by sending a JSON-RPC request using curl:
 
 ```bash
-curl -XPost http://your-symfony-project/jsonrpc/ -d '{"jsonrpc":"2.0","method":"testhello","id":"foo","params":{"name":"Joe"}}'
+curl -XPOST http://your-symfony-project/jsonrpc/ -d '{"jsonrpc":"2.0","method":"testhello","id":"foo","params":{"name":"Joe"}}'
 ```
 
 and you should get the following answer:
