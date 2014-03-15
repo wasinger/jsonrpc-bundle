@@ -71,25 +71,30 @@ class JsonRpcController extends ContainerAware
     public function execute(Request $httprequest)
     {
         $json = $httprequest->getContent();
-        $request = json_decode($json);
+        $request = json_decode($json, true);
+
         if ($request === null) {
             return $this->getErrorResponse(self::PARSE_ERROR, null);
-        } elseif (!(isset($request->jsonrpc) && isset($request->method) && $request->jsonrpc == '2.0')) {
+        } elseif (!(isset($request['jsonrpc']) && isset($request['method']) && $request['jsonrpc'] == '2.0')) {
             return $this->getErrorResponse(self::INVALID_REQUEST, $request->id);
         }
-        if (!in_array($request->method, array_keys($this->config['functions']))) {
+
+        if (!in_array($request['method'], array_keys($this->config['functions']))) {
             return $this->getErrorResponse(self::METHOD_NOT_FOUND, $request->id);
         }
-        $service = $this->container->get($this->config['functions'][$request->method]['service']);
-        $method = $this->config['functions'][$request->method]['method'];
-        $params = (isset($request->params) ? $request->params : array());
+
+        $service = $this->container->get($this->config['functions'][$request['method']]['service']);
+        $method = $this->config['functions'][$request['method']]['method'];
+        $params = (isset($request['params']) ? $request['params'] : array());
+
         if (is_callable(array($service, $method))) {
             $r = new \ReflectionMethod($service, $method);
+
             if (is_array($params)) {
                 if (!(count($params) >= $r->getNumberOfRequiredParameters()
                     && count($params) <= $r->getNumberOfParameters())
                 ) {
-                    return $this->getErrorResponse(self::INVALID_PARAMS, $request->id,
+                    return $this->getErrorResponse(self::INVALID_PARAMS, $request['id'],
                         sprintf('Number of given parameters (%d) does not match the number of expected parameters (%d required, %d total)',
                             count($params), $r->getNumberOfRequiredParameters(), $r->getNumberOfParameters()));
                 }
@@ -100,7 +105,7 @@ class JsonRpcController extends ContainerAware
                     /* @var \ReflectionParameter $rp */
                     $name = $rp->name;
                     if (!isset($params->$name) && !$rp->isOptional()) {
-                        return $this->getErrorResponse(self::INVALID_PARAMS, $request->id,
+                        return $this->getErrorResponse(self::INVALID_PARAMS, $request['id'],
                             sprintf('Parameter %s is missing', $name));
                     }
                     if (isset($params->$name)) {
@@ -111,23 +116,26 @@ class JsonRpcController extends ContainerAware
                 }
                 $params = $newparams;
             }
+
             try {
                 $result = call_user_func_array(array($service, $method), $params);
             } catch (\Exception $e) {
-                return $this->getErrorResponse(self::INTERNAL_ERROR, $request->id, $e->getMessage());
+                return $this->getErrorResponse(self::INTERNAL_ERROR, $request['id'], $e->getMessage());
             }
+
             $response = array('jsonrpc' => '2.0');
             $response['result'] = $result;
-            $response['id'] = (isset($request->id) ? $request->id : null);
+            $response['id'] = (isset($request['id']) ? $request['id'] : null);
 
             if ($this->container->has('jms_serializer')) {
                 $response = $this->container->get('jms_serializer')->serialize($response, 'json', $this->serializationContext);
             } else {
                 $response = json_encode($response);
             }
+
             return new Response($response, 200, array('Content-Type' => 'application/json'));
         } else {
-            return $this->getErrorResponse(self::METHOD_NOT_FOUND, $request->id);
+            return $this->getErrorResponse(self::METHOD_NOT_FOUND, $request['id']);
         }
     }
 
@@ -151,6 +159,7 @@ class JsonRpcController extends ContainerAware
                 $message = 'Internal error';
                 break;
         }
+
         return array('code' => $code, 'message' => $message);
     }
 
@@ -158,8 +167,13 @@ class JsonRpcController extends ContainerAware
     {
         $response = array('jsonrpc' => '2.0');
         $response['error'] = $this->getError($code);
-        if ($data != null) $response['error']['data'] = $data;
+
+        if ($data != null) {
+            $response['error']['data'] = $data;
+        }
+
         $response['id'] = $id;
+
         return new Response(json_encode($response), 200, array('Content-Type' => 'application/json'));
     }
 
