@@ -76,11 +76,11 @@ class JsonRpcController extends ContainerAware
         if ($request === null) {
             return $this->getErrorResponse(self::PARSE_ERROR, null);
         } elseif (!(isset($request['jsonrpc']) && isset($request['method']) && $request['jsonrpc'] == '2.0')) {
-            return $this->getErrorResponse(self::INVALID_REQUEST, $request->id);
+            return $this->getErrorResponse(self::INVALID_REQUEST, $request['id']);
         }
 
         if (!in_array($request['method'], array_keys($this->config['functions']))) {
-            return $this->getErrorResponse(self::METHOD_NOT_FOUND, $request->id);
+            return $this->getErrorResponse(self::METHOD_NOT_FOUND, $request['id']);
         }
 
         $service = $this->container->get($this->config['functions'][$request['method']]['service']);
