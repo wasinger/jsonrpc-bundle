@@ -140,6 +140,39 @@ class JsonRpcController extends ContainerAware
         }
     }
 
+    /**
+     * Add a new function that can be called by RPC
+     *
+     * @param string $alias The function name used in the RPC call
+     * @param string $service The service name of the method to call
+     * @param string $method The method of $service
+     * @param bool $overwrite Whether to overwrite an existing function
+     * @throws \InvalidArgumentException
+     */
+    public function addMethod($alias, $service, $method, $overwrite = false)
+    {
+        if (!isset($this->config['functions'])) $this->config['functions'] = array();
+        if (isset($this->config['functions'][$alias]) && !$overwrite) {
+            throw new \InvalidArgumentException('JsonRpcController: The function "' . $alias . '" already exists.');
+        }
+        $this->config['functions'][$alias] = array(
+            'service' => $service,
+            'method' => $method
+        );
+    }
+
+    /**
+     * Remove a method definition
+     *
+     * @param string $alias
+     */
+    public function removeMethod($alias)
+    {
+        if (isset($this->config['functions'][$alias])) {
+            unset($this->config['functions'][$alias]);
+        }
+    }
+
     protected function getError($code)
     {
         $message = '';

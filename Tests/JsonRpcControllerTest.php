@@ -61,6 +61,30 @@ class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(-32602, $response['error']['code']);
     }
 
+    public function testAddMethod()
+    {
+        $requestdata = array(
+            'jsonrpc' => '2.0',
+            'id' => 'test',
+            'method' => 'testhi',
+            'params' => array('name' => 'Tom')
+        );
+        // this request will fail because there is no such method "testhi"
+        $response = $this->makeRequest($requestdata);
+        $this->assertArrayHasKey('error', $response);
+        $this->assertArrayNotHasKey('result', $response);
+        $this->assertEquals(-32601, $response['error']['code']);
+
+        // add the method definition for "testhi"
+        $this->controller->addMethod('testhi', 'wa72_jsonrpc.testservice', 'hi');
+
+        // now the request should succeed
+        $response = $this->makeRequest($requestdata);
+        $this->assertArrayHasKey('result', $response);
+        $this->assertArrayNotHasKey('error', $response);
+        $this->assertEquals('Hi Tom!', $response['result']);
+    }
+
     private function makeRequest($requestdata)
     {
         return json_decode($this->controller->execute(
