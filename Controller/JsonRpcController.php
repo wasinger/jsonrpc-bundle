@@ -44,9 +44,9 @@ class JsonRpcController extends ContainerAware
     const INTERNAL_ERROR = -32603;
 
     /**
-     * @var array $config
+     * @var array $functions
      */
-    private $config;
+    private $functions = array();
 
     /**
      * @var \JMS\Serializer\SerializationContext
@@ -56,11 +56,14 @@ class JsonRpcController extends ContainerAware
     /**
      * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
      * @param array $config Associative array for configuration, expects at least a key "functions"
-     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($container, $config)
     {
-        $this->config = $config;
+        if (isset($config['functions'])) {
+            if (!is_array($config['functions'])) throw new \InvalidArgumentException('Configuration parameter "functions" must be array');
+            $this->functions = $config['functions'];
+        }
         $this->setContainer($container);
     }
 
@@ -80,12 +83,12 @@ class JsonRpcController extends ContainerAware
             return $this->getErrorResponse(self::INVALID_REQUEST, $requestId);
         }
 
-        if (!in_array($request['method'], array_keys($this->config['functions']))) {
+        if (!in_array($request['method'], array_keys($this->functions))) {
             return $this->getErrorResponse(self::METHOD_NOT_FOUND, $requestId);
         }
 
-        $service = $this->container->get($this->config['functions'][$request['method']]['service']);
-        $method = $this->config['functions'][$request['method']]['method'];
+        $service = $this->container->get($this->functions[$request['method']]['service']);
+        $method = $this->functions[$request['method']]['method'];
         $params = (isset($request['params']) ? $request['params'] : array());
 
         if (is_callable(array($service, $method))) {
@@ -151,11 +154,11 @@ class JsonRpcController extends ContainerAware
      */
     public function addMethod($alias, $service, $method, $overwrite = false)
     {
-        if (!isset($this->config['functions'])) $this->config['functions'] = array();
-        if (isset($this->config['functions'][$alias]) && !$overwrite) {
+        if (!isset($this->functions)) $this->functions = array();
+        if (isset($this->functions[$alias]) && !$overwrite) {
             throw new \InvalidArgumentException('JsonRpcController: The function "' . $alias . '" already exists.');
         }
-        $this->config['functions'][$alias] = array(
+        $this->functions[$alias] = array(
             'service' => $service,
             'method' => $method
         );
@@ -168,8 +171,8 @@ class JsonRpcController extends ContainerAware
      */
     public function removeMethod($alias)
     {
-        if (isset($this->config['functions'][$alias])) {
-            unset($this->config['functions'][$alias]);
+        if (isset($this->functions[$alias])) {
+            unset($this->functions[$alias]);
         }
     }
 
