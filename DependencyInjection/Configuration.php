@@ -28,8 +28,22 @@ class Configuration implements ConfigurationInterface
                         ->children()
                             ->scalarNode('service')->end()
                             ->scalarNode('method')->end()
+                            ->arrayNode('jms_serialization_context')
+                                ->children()
+                                    ->arrayNode('groups')
+                                        ->beforeNormalization()
+                                            ->ifTrue(function ($v) { return is_string($v); })
+                                            ->then(function ($v) { return array($v); })
+                                        ->end()
+                                        ->prototype('scalar')->end()
+                                    ->end()
+                                    ->scalarNode('version')->end()
+                                    ->booleanNode('max_depth_checks')->end()
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;
