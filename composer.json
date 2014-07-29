@@ -16,6 +16,9 @@
         "php":">=5.3.1",
         "symfony/symfony":"~2.1"
     },
+    "suggest": {
+        "jms/serializer-bundle": "Allows you to easily serialize, and deserialize data of any complexity"
+    },
     "autoload":{
         "psr-0":{
             "Wa72\\JsonRpcBundle":""
