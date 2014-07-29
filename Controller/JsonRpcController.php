@@ -49,11 +49,6 @@ class JsonRpcController extends ContainerAware
     private $functions = array();
 
     /**
-     * @var \JMS\Serializer\SerializationContext
-     */
-    private $serializationContext;
-
-    /**
      * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
      * @param array $config Associative array for configuration, expects at least a key "functions"
      * @throws \InvalidArgumentException
@@ -87,8 +82,9 @@ class JsonRpcController extends ContainerAware
             return $this->getErrorResponse(self::METHOD_NOT_FOUND, $requestId);
         }
 
-        $service = $this->container->get($this->functions[$request['method']]['service']);
-        $method = $this->functions[$request['method']]['method'];
+        $configMethod = $this->config['functions'][$request['method']];
+        $service = $this->container->get($configMethod['service']);
+        $method = $configMethod['method'];
         $params = (isset($request['params']) ? $request['params'] : array());
 
         if (is_callable(array($service, $method))) {
@@ -132,7 +128,7 @@ class JsonRpcController extends ContainerAware
             $response['id'] = $requestId;
 
             if ($this->container->has('jms_serializer')) {
-                $response = $this->container->get('jms_serializer')->serialize($response, 'json', $this->serializationContext);
+                $response = $this->container->get('jms_serializer')->serialize($response, 'json', $this->createSerializationContext($configMethod));
             } else {
                 $response = json_encode($response);
             }
@@ -215,12 +211,30 @@ class JsonRpcController extends ContainerAware
     }
 
     /**
-     * Set SerializationContext for using with jms_serializer
+     * Create SerializationContext for using with jms_serializer
      *
-     * @param \JMS\Serializer\SerializationContext $context
+     * @param array $config
+     * @return \JMS\Serializer\SerializationContext
      */
-    public function setSerializationContext($context)
+    protected function createSerializationContext(array $config)
     {
-        $this->serializationContext = $context;
+        $context = \JMS\Serializer\SerializationContext::create();
+
+        if (isset($config['jms_serialization_context'])) {
+            $jmsConfig = $config['jms_serialization_context'];
+            if (isset($jmsConfig['groups'])) {
+                $context->setGroups($jmsConfig['groups']);
+            }
+
+            if (isset($jmsConfig['version'])) {
+                $context->setVersion($config['jms_serialization_context']['version']);
+            }
+
+            if (isset($jmsConfig['max_depth_checks'])) {
+                $context->enableMaxDepthChecks($jmsConfig['max_depth_checks']);
+            }
+        }
+
+        return $context;
     }
 }
