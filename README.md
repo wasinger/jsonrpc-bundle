@@ -5,7 +5,7 @@ JsonRpcBundle
 
 JsonRpcBundle is a bundle for Symfony 2.1 and up that allows to easily build a JSON-RPC server for web services using [JSON-RPC 2.0] (http://www.jsonrpc.org/specification).
 
-The bundle contains a controller that is able to expose methods of any service registered in the Symfony service container as a JSON-RPC web service. The return value of the service method is converted to JSON using [jms_serializer] (https://github.com/schmittjoh/JMSSerializerBundle), if this service is available, and json_encode() otherwise. 
+The bundle contains a controller that is able to expose methods of any service registered in the Symfony service container as a JSON-RPC web service. The return value of the service method is converted to JSON using [jms_serializer] (https://github.com/schmittjoh/JMSSerializerBundle), if this service is available, and json_encode() otherwise.
 
 Of course, it doesn't simply expose all your services' methods to the public, but only those explicitely mentioned in the configuration. And service methods cannot be called by it's original name but by an alias to be defined in the configuration.
 
@@ -34,7 +34,7 @@ Configuration
 You must configure which functions of the services registered in the Service Container will be available as web services.
 
 Configuration is done under the "wa72_json_rpc" key of your configuration (usually defined in your app/config/config.yml).
-To enable a Symfony2 service method to be called as a JSON-RPC web service, add it to the "functions" array of the configuration. 
+To enable a Symfony2 service method to be called as a JSON-RPC web service, add it to the "functions" array of the configuration.
 The key of an entry of the "functions" array is the alias name for the method to be called over RPC and it needs two sub keys:
 "service" specifies the name of the service and "method" the name of the method to call. Example:
 
@@ -52,6 +52,21 @@ wa72_json_rpc:
 
 In this example, "myfunction1" and "anotherfunction" are aliases for service methods that are used as JSON-RPC method names.
 A method name "myfunction1" in the JSON-RPC call will then call the method "methodofservice" of service "mybundle.servicename".
+
+If you use [jms_serializer] (https://github.com/schmittjoh/JMSSerializerBundle) you can also configure exclusion strategies (groups, version, or max depth checks) :
+
+```yaml
+# app/config/config.yml
+wa72_json_rpc:
+    functions:
+        myfunction1:
+            service: "mybundle.servicename"
+            method: "methodofservice"
+            jms_serialization_context:
+                group: "my_group"
+                version: "1"
+                max_depth_checks: true
+```
 
 Testing
 -------
