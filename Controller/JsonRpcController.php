@@ -132,7 +132,8 @@ class JsonRpcController extends ContainerAware
             $response['id'] = $requestId;
 
             if ($this->container->has('jms_serializer')) {
-                $response = $this->container->get('jms_serializer')->serialize($response, 'json', $this->serializationContext);
+                $serializationContext = $this->getSerializationContext($this->functions[$request['method']]);
+                $response = $this->container->get('jms_serializer')->serialize($response, 'json', $serializationContext);
             } else {
                 $response = json_encode($response);
             }
@@ -222,5 +223,34 @@ class JsonRpcController extends ContainerAware
     public function setSerializationContext($context)
     {
         $this->serializationContext = $context;
+    }
+
+    /**
+     * Get SerializationContext or creates one if jms_serialization_context option is set
+     *
+     * @param array $functionConfig
+     * @return \JMS\Serializer\SerializationContext
+     */
+    protected function getSerializationContext(array $functionConfig)
+    {
+        if (isset($functionConfig['jms_serialization_context'])) {
+            $serializationContext = \JMS\Serializer\SerializationContext::create();
+
+            if (isset($functionConfig['jms_serialization_context']['groups'])) {
+                $serializationContext->setGroups($functionConfig['jms_serialization_context']['groups']);
+            }
+
+            if (isset($functionConfig['jms_serialization_context']['version'])) {
+                $serializationContext->setVersion($functionConfig['jms_serialization_context']['version']);
+            }
+
+            if (isset($functionConfig['jms_serialization_context']['max_depth_checks'])) {
+                $serializationContext->enableMaxDepthChecks($functionConfig['jms_serialization_context']['max_depth_checks']);
+            }
+        } else {
+            $serializationContext = $this->serializationContext;
+        }
+
+        return $serializationContext;
     }
 }
