@@ -68,25 +68,18 @@ wa72_json_rpc:
                 max_depth_checks: true
 ```
 
+Starting with v0.4.0, it is also possible to fully expose all methods of a service by tagging it with 'wa72_jsonrpc.exposable'.
+All public methods of services tagged with 'wa72_jsonrpc.exposable' can be called via JSON-RPC. The method name
+to be used in the RPC call is "service:method", i.e. the name of the service and the method separated by colon.
+
 Testing
 -------
 
-The bundle comes with a test service. To see if it works add the following configuration to your config.yml:
-
-```yaml
-# app/config/config.yml
-wa72_json_rpc:
-    functions:
-        testhello:
-            service: "wa72_jsonrpc.testservice"
-            method: "hello"
-```
-
-If you have imported the bundle's routing to /jsonrpc (see above) you should then be able to test your service
-by sending a JSON-RPC request using curl:
+The bundle comes with a test service. If you have imported the bundle's routing to /jsonrpc (see above) you should be
+able to test your service by sending a JSON-RPC request using curl:
 
 ```bash
-curl -XPOST http://your-symfony-project/jsonrpc/ -d '{"jsonrpc":"2.0","method":"testhello","id":"foo","params":{"name":"Joe"}}'
+curl -XPOST http://your-symfony-project/jsonrpc/ -d '{"jsonrpc":"2.0","method":"wa72_jsonrpc.testservice:hello","id":"foo","params":{"name":"Joe"}}'
 ```
 
 and you should get the following answer:
@@ -96,3 +89,6 @@ and you should get the following answer:
 ```
 
 There are also unit tests you can run using phpunit.
+
+
+(c) 2014 Christoph Singer, Web-Agentur 72. Licensed under the MIT license.

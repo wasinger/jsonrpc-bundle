@@ -32,6 +32,11 @@ use Symfony\Component\DependencyInjection\ContainerAware;
  * A method name "myfunction1" in the RPC request will then call
  * $this->container->get('mybundle.servicename')->methodofservice()
  *
+ * If you want to add a service completely so that all public methods of
+ * this service may be called, use the addService($servicename) method.
+ * Methods of the services added this way can be called remotely using
+ * "servicename:method" as RPC method name.
+ *
  * @license MIT
  * @author Christoph Singer
  *
