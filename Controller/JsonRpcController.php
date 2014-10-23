@@ -2,6 +2,7 @@
 
 namespace Wa72\JsonRpcBundle\Controller;
 
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerAware;
@@ -44,9 +45,18 @@ class JsonRpcController extends ContainerAware
     const INTERNAL_ERROR = -32603;
 
     /**
+     * Functions that are allowed to be called
+     *
      * @var array $functions
      */
     private $functions = array();
+
+    /**
+     * Array of names of fully exposed services (all methods of this services are allowed to be called)
+     *
+     * @var array $services
+     */
+    private $services = array();
 
     /**
      * @var \JMS\Serializer\SerializationContext
@@ -83,12 +93,24 @@ class JsonRpcController extends ContainerAware
             return $this->getErrorResponse(self::INVALID_REQUEST, $requestId);
         }
 
-        if (!in_array($request['method'], array_keys($this->functions))) {
+        if (in_array($request['method'], array_keys($this->functions))) {
+            $servicename = $this->functions[$request['method']]['service'];
+            $method = $this->functions[$request['method']]['method'];
+        } else {
+            if (count($this->services) && strpos($request['method'], ':') > 0) {
+                list($servicename, $method) = explode(':', $request['method']);
+                if (!in_array($servicename, $this->services)) {
+                    return $this->getErrorResponse(self::METHOD_NOT_FOUND, $requestId);
+                }
+            } else {
+                return $this->getErrorResponse(self::METHOD_NOT_FOUND, $requestId);
+            }
+        }
+        try {
+            $service = $this->container->get($servicename);
+        } catch (ServiceNotFoundException $e) {
             return $this->getErrorResponse(self::METHOD_NOT_FOUND, $requestId);
         }
-
-        $service = $this->container->get($this->functions[$request['method']]['service']);
-        $method = $this->functions[$request['method']]['method'];
         $params = (isset($request['params']) ? $request['params'] : array());
 
         if (is_callable(array($service, $method))) {
@@ -163,6 +185,17 @@ class JsonRpcController extends ContainerAware
             'service' => $service,
             'method' => $method
         );
+    }
+
+    /**
+     * Add a new service that is fully exposed by json-rpc
+     *
+     * @param string $service The id of a service
+     */
+    public function addService($service)
+    {
+        echo "adding service: $service\n";
+        $this->services[] = $service;
     }
 
     /**

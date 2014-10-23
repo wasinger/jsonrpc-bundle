@@ -42,7 +42,7 @@ class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
             'method' => 'testhello',
             'params' => array('name' => 'Joe')
         );
-        $response = $this->makeRequest($requestdata);
+        $response = $this->makeRequest($this->controller, $requestdata);
         $this->assertEquals('2.0', $response['jsonrpc']);
         $this->assertEquals('test', $response['id']);
         $this->assertArrayHasKey('result', $response);
@@ -55,10 +55,43 @@ class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
             'id' => 'test',
             'method' => 'testhello'
         );
-        $response = $this->makeRequest($requestdata);
+        $response = $this->makeRequest($this->controller, $requestdata);
         $this->assertArrayHasKey('error', $response);
         $this->assertArrayNotHasKey('result', $response);
         $this->assertEquals(-32602, $response['error']['code']);
+    }
+
+    public function testService()
+    {
+        $controller = $this->kernel->getContainer()->get('wa72_jsonrpc.jsonrpccontroller');
+        $requestdata = array(
+            'jsonrpc' => '2.0',
+            'id' => 'testservice',
+            'method' => 'wa72_jsonrpc.testservice:hello',
+            'params' => array('name' => 'Max')
+        );
+
+        $response = $this->makeRequest($controller, $requestdata);
+        $this->assertEquals('2.0', $response['jsonrpc']);
+        $this->assertEquals('testservice', $response['id']);
+        $this->assertArrayNotHasKey('error', $response);
+        $this->assertArrayHasKey('result', $response);
+        $this->assertEquals('Hello Max!', $response['result']);
+
+        // Test: non-existing service should return "Method not found" error
+        $requestdata = array(
+            'jsonrpc' => '2.0',
+            'id' => 'testservice',
+            'method' => 'someservice:somemethod',
+            'params' => array('name' => 'Max')
+        );
+
+        $response = $this->makeRequest($controller, $requestdata);
+        $this->assertEquals('2.0', $response['jsonrpc']);
+        $this->assertEquals('testservice', $response['id']);
+        $this->assertArrayNotHasKey('result', $response);
+        $this->assertArrayHasKey('error', $response);
+        $this->assertEquals(-32601, $response['error']['code']);
     }
 
     public function testAddMethod()
@@ -70,7 +103,7 @@ class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
             'params' => array('name' => 'Tom')
         );
         // this request will fail because there is no such method "testhi"
-        $response = $this->makeRequest($requestdata);
+        $response = $this->makeRequest($this->controller, $requestdata);
         $this->assertArrayHasKey('error', $response);
         $this->assertArrayNotHasKey('result', $response);
         $this->assertEquals(-32601, $response['error']['code']);
@@ -79,15 +112,15 @@ class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
         $this->controller->addMethod('testhi', 'wa72_jsonrpc.testservice', 'hi');
 
         // now the request should succeed
-        $response = $this->makeRequest($requestdata);
+        $response = $this->makeRequest($this->controller, $requestdata);
         $this->assertArrayHasKey('result', $response);
         $this->assertArrayNotHasKey('error', $response);
         $this->assertEquals('Hi Tom!', $response['result']);
     }
 
-    private function makeRequest($requestdata)
+    private function makeRequest($controller, $requestdata)
     {
-        return json_decode($this->controller->execute(
+        return json_decode($controller->execute(
             new Request(array(), array(), array(), array(), array(), array(), json_encode($requestdata))
         )->getContent(), true);
     }

@@ -9,3 +9,5 @@ services:
 
     wa72_jsonrpc.testservice:
         class: %wa72_jsonrpc.testservice.class%
+        tags:
+          - {name: wa72_jsonrpc.exposable}
