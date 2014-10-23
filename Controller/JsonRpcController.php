@@ -194,7 +194,6 @@ class JsonRpcController extends ContainerAware
      */
     public function addService($service)
     {
-        echo "adding service: $service\n";
         $this->services[] = $service;
     }
 
