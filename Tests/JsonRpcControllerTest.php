@@ -94,6 +94,51 @@ class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(-32601, $response['error']['code']);
     }
 
+    public function testParameters()
+    {
+        // params as associative array in right order
+        $controller = $this->kernel->getContainer()->get('wa72_jsonrpc.jsonrpccontroller');
+        $requestdata = array(
+            'jsonrpc' => '2.0',
+            'id' => 'parametertest',
+            'method' => 'wa72_jsonrpc.testservice:parametertest',
+            'params' => array('arg1' => 'abc', 'arg2' => 'def', 'arg_array' => array())
+        );
+
+        $response = $this->makeRequest($controller, $requestdata);
+        $this->assertArrayNotHasKey('error', $response);
+        $this->assertArrayHasKey('result', $response);
+        $this->assertEquals('abcdef', $response['result']);
+
+        // params as simple array in right order
+        $controller = $this->kernel->getContainer()->get('wa72_jsonrpc.jsonrpccontroller');
+        $requestdata = array(
+            'jsonrpc' => '2.0',
+            'id' => 'parametertest',
+            'method' => 'wa72_jsonrpc.testservice:parametertest',
+            'params' => array('abc', 'def', array())
+        );
+
+        $response = $this->makeRequest($controller, $requestdata);
+        $this->assertArrayNotHasKey('error', $response);
+        $this->assertArrayHasKey('result', $response);
+        $this->assertEquals('abcdef', $response['result']);
+
+        // params as associative array in mixed order
+        $controller = $this->kernel->getContainer()->get('wa72_jsonrpc.jsonrpccontroller');
+        $requestdata = array(
+            'jsonrpc' => '2.0',
+            'id' => 'parametertest',
+            'method' => 'wa72_jsonrpc.testservice:parametertest',
+            'params' => array('arg_array' => array(), 'arg2' => 'def', 'arg1' => 'abc')
+        );
+
+        $response = $this->makeRequest($controller, $requestdata);
+        $this->assertArrayNotHasKey('error', $response);
+        $this->assertArrayHasKey('result', $response);
+        $this->assertEquals('abcdef', $response['result']);
+    }
+
     public function testAddMethod()
     {
         $requestdata = array(
@@ -120,6 +165,7 @@ class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
 
     private function makeRequest($controller, $requestdata)
     {
+        echo json_encode($requestdata);
         return json_decode($controller->execute(
             new Request(array(), array(), array(), array(), array(), array(), json_encode($requestdata))
         )->getContent(), true);

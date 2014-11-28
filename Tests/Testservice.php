@@ -11,4 +11,10 @@ class Testservice {
     {
         return 'Hi ' . $name . '!';
     }
+
+    public function parametertest($arg1, $arg2, $arg_array)
+    {
+        if (!is_array($arg_array)) throw new \InvalidArgumentException('arg_array must be an array!');
+        return $arg1 . $arg2;
+    }
 }
