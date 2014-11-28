@@ -1,3 +1,7 @@
+### v0.4.2 2014-11-28 ###
+-   fixed bug introduced in v0.2.0: named parameters given in associative arrays were always passed to the method in
+    the order they were given, not by their names. Thanks to @teet.
+
 ### v0.4.1 2014-11-19 ###
 -   raised required symfony version to 2.3
 -   Added mandatory LICENSE and index.rst files
