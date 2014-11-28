@@ -81,7 +81,7 @@ register the test service in your DI container:
     # app/config/config_dev.yml
     services:
         wa72_jsonrpc.testservice:
-            class: %wa72_jsonrpc.testservice.class%
+            class: Wa72\\JsonRpcBundle\\Tests\\Testservice
             tags:
               - {name: wa72_jsonrpc.exposable}
 
