@@ -165,7 +165,6 @@ class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
 
     private function makeRequest($controller, $requestdata)
     {
-        echo json_encode($requestdata);
         return json_decode($controller->execute(
             new Request(array(), array(), array(), array(), array(), array(), json_encode($requestdata))
         )->getContent(), true);
