@@ -74,21 +74,22 @@ Testing
 -------
 
 The bundle comes with a test service. If you have imported the bundle's routing to ``/jsonrpc`` (see above)
-register the test service in your DI containter:
+register the test service in your DI container:
 
 .. code-block:: yaml
 
-    # app/config/config.yml
-    wa72_jsonrpc.testservice:
-        class: %wa72_jsonrpc.testservice.class%
-        tags:
-          - {name: wa72_jsonrpc.exposable}
+    # app/config/config_dev.yml
+    services:
+        wa72_jsonrpc.testservice:
+            class: %wa72_jsonrpc.testservice.class%
+            tags:
+              - {name: wa72_jsonrpc.exposable}
 
 You should then be able to test your service by sending a JSON-RPC request using curl:
 
 .. code-block:: bash
 
-    curl -XPOST http://your-symfony-project/jsonrpc/ -d '{"jsonrpc":"2.0","method":"wa72_jsonrpc.testservice:hello","id":"foo","params":{"name":"Joe"}}'
+    curl -XPOST http://your-symfony-project/app_dev.php/jsonrpc/ -d '{"jsonrpc":"2.0","method":"wa72_jsonrpc.testservice:hello","id":"foo","params":{"name":"Joe"}}'
 
 and you should get the following answer:
 

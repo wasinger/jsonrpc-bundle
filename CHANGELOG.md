@@ -1,6 +1,6 @@
 ### v0.4.4 2014-11-28 ###
 -   The test service is no longer registered automatically. If you want to use it,
-    you must define it in the config.yml of your application, see updated README.
+    you must define it in the config.yml of your application, see updated [Resources/doc/index.rst](Resources/doc/index.rst).
 
 ### v0.4.2 2014-11-28 ###
 -   fixed bug introduced in v0.2.0: named parameters given in associative arrays were always passed to the method in
