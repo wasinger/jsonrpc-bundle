@@ -1,2 +1,7 @@
 framework:
   secret: dummy
+services:
+    wa72_jsonrpc.testservice:
+        class: Wa72\JsonRpcBundle\Tests\Testservice
+        tags:
+          - {name: wa72_jsonrpc.exposable}

@@ -73,8 +73,18 @@ to be used in the RPC call is "service\:method", i.e. the name of the service an
 Testing
 -------
 
-The bundle comes with a test service. If you have imported the bundle's routing to /jsonrpc (see above) you should be
-able to test your service by sending a JSON-RPC request using curl:
+The bundle comes with a test service. If you have imported the bundle's routing to ``/jsonrpc`` (see above)
+register the test service in your DI containter:
+
+.. code-block:: yaml
+
+    # app/config/config.yml
+    wa72_jsonrpc.testservice:
+        class: %wa72_jsonrpc.testservice.class%
+        tags:
+          - {name: wa72_jsonrpc.exposable}
+
+You should then be able to test your service by sending a JSON-RPC request using curl:
 
 .. code-block:: bash
 
@@ -86,7 +96,8 @@ and you should get the following answer:
 
     {"jsonrpc":"2.0","result":"Hello Joe!","id":"foo"}
 
-There are also unit tests you can run using phpunit.
+There are also unit tests for phpunit. Just install the required dependencies using ``composer install`` and run
+``phpunit`` in the root directory of the project.
 
 © 2014 Christoph Singer, Web-Agentur 72. Licensed under the MIT license.
 
