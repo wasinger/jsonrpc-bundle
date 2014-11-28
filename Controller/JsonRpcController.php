@@ -129,20 +129,21 @@ class JsonRpcController extends ContainerAware
                         sprintf('Number of given parameters (%d) does not match the number of expected parameters (%d required, %d total)',
                             count($params), $r->getNumberOfRequiredParameters(), $r->getNumberOfParameters()));
                 }
-            } elseif (is_object($params)) {
+            }
+            if ($this->isAssoc($params)) {
                 $rps = $r->getParameters();
                 $newparams = array();
                 foreach ($rps as $i => $rp) {
                     /* @var \ReflectionParameter $rp */
                     $name = $rp->name;
-                    if (!isset($params->$name) && !$rp->isOptional()) {
+                    if (!isset($params[$rp->name]) && !$rp->isOptional()) {
                         return $this->getErrorResponse(self::INVALID_PARAMS, $requestId,
                             sprintf('Parameter %s is missing', $name));
                     }
-                    if (isset($params->$name)) {
-                        $newparams[$i] = $params->$name;
+                    if (isset($params[$rp->name])) {
+                        $newparams[] = $params[$rp->name];
                     } else {
-                        $newparams[$i] = null;
+                        $newparams[] = null;
                     }
                 }
                 $params = $newparams;
@@ -289,5 +290,16 @@ class JsonRpcController extends ContainerAware
         }
 
         return $serializationContext;
+    }
+    
+    /**
+     * Finds whether a variable is an associative array
+     *
+     * @param $var
+     * @return bool
+     */
+    protected function isAssoc($var)
+    {
+        return array_keys($var) !== range(0, count($var) - 1);
     }
 }
