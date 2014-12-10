@@ -5,6 +5,7 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Wa72\JsonRpcBundle\Controller\JsonRpcController;
+use Wa72\JsonRpcBundle\Tests\Fixtures\Testparameter;
 
 require __DIR__ . '/Fixtures/app/Wa72JsonRpcBundleTestKernel.php';
 
@@ -96,7 +97,7 @@ class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
 
     public function testParameters()
     {
-        // params as associative array in right order
+/*        // params as associative array in right order
         $controller = $this->kernel->getContainer()->get('wa72_jsonrpc.jsonrpccontroller');
         $requestdata = array(
             'jsonrpc' => '2.0',
@@ -137,6 +138,23 @@ class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
         $this->assertArrayNotHasKey('error', $response);
         $this->assertArrayHasKey('result', $response);
         $this->assertEquals('abcdef', $response['result']);
+*/
+        // params with objects
+        $controller = $this->kernel->getContainer()->get('wa72_jsonrpc.jsonrpccontroller');
+        $arg3 = new Testparameter('abc');
+        $arg3->setB('def');
+        $arg3->setC('ghi');
+        $requestdata = array(
+            'jsonrpc' => '2.0',
+            'id' => 'testParameterTypes',
+            'method' => 'wa72_jsonrpc.testservice:testParameterTypes',
+            'params' => array('arg1' => array(), 'arg2' => new \stdClass(), 'arg3' => $arg3)
+        );
+
+        $response = $this->makeRequest($controller, $requestdata);
+        $this->assertArrayNotHasKey('error', $response);
+        $this->assertArrayHasKey('result', $response);
+        $this->assertEquals('abcdefghi', $response['result']);
     }
 
     public function testAddMethod()
@@ -165,9 +183,11 @@ class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
 
     private function makeRequest($controller, $requestdata)
     {
-        return json_decode($controller->execute(
-            new Request(array(), array(), array(), array(), array(), array(), json_encode($requestdata))
-        )->getContent(), true);
+        /** @var \JMS\Serializer\Serializer $serializer */
+        $serializer = $this->kernel->getContainer()->get('jms_serializer');
+        return $serializer->deserialize($controller->execute(
+            new Request(array(), array(), array(), array(), array(), array(), $serializer->serialize($requestdata, 'json'))
+        )->getContent(), 'array', 'json');
     }
 
     /**
