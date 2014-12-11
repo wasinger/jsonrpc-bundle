@@ -97,7 +97,7 @@ class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
 
     public function testParameters()
     {
-/*        // params as associative array in right order
+        // params as associative array in right order
         $controller = $this->kernel->getContainer()->get('wa72_jsonrpc.jsonrpccontroller');
         $requestdata = array(
             'jsonrpc' => '2.0',
@@ -138,7 +138,7 @@ class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
         $this->assertArrayNotHasKey('error', $response);
         $this->assertArrayHasKey('result', $response);
         $this->assertEquals('abcdef', $response['result']);
-*/
+
         // params with objects
         $controller = $this->kernel->getContainer()->get('wa72_jsonrpc.jsonrpccontroller');
         $arg3 = new Testparameter('abc');
@@ -185,9 +185,9 @@ class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
     {
         /** @var \JMS\Serializer\Serializer $serializer */
         $serializer = $this->kernel->getContainer()->get('jms_serializer');
-        return $serializer->deserialize($controller->execute(
+        return json_decode($controller->execute(
             new Request(array(), array(), array(), array(), array(), array(), $serializer->serialize($requestdata, 'json'))
-        )->getContent(), 'array', 'json');
+        )->getContent(), true);
     }
 
     /**

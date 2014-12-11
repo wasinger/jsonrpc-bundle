@@ -1,18 +1,32 @@
 <?php
 namespace Wa72\JsonRpcBundle\Tests\Fixtures;
 
+use JMS\Serializer\Annotation\Type;
+
 class Testparameter {
+    /**
+     * @Type("string")
+     */
     private $a;
+    /**
+     * @Type("string")
+     */
     protected $b;
+    /**
+     * @Type("string")
+     */
     public $c;
 
+    /**
+     * @param string $a
+     */
     public function __construct($a)
     {
         $this->a = $a;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getA()
     {
@@ -20,7 +34,7 @@ class Testparameter {
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getB()
     {
@@ -28,7 +42,7 @@ class Testparameter {
     }
 
     /**
-     * @param mixed $b
+     * @param string $b
      */
     public function setB($b)
     {
@@ -36,7 +50,7 @@ class Testparameter {
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getC()
     {
@@ -44,7 +58,7 @@ class Testparameter {
     }
 
     /**
-     * @param mixed $c
+     * @param string $c
      */
     public function setC($c)
     {

@@ -120,6 +120,7 @@ class JsonRpcController extends ContainerAware
 
         if (is_callable(array($service, $method))) {
             $r = new \ReflectionMethod($service, $method);
+            $rps = $r->getParameters();
 
             if (is_array($params)) {
                 if (!(count($params) >= $r->getNumberOfRequiredParameters()
@@ -129,9 +130,9 @@ class JsonRpcController extends ContainerAware
                         sprintf('Number of given parameters (%d) does not match the number of expected parameters (%d required, %d total)',
                             count($params), $r->getNumberOfRequiredParameters(), $r->getNumberOfParameters()));
                 }
+
             }
             if ($this->isAssoc($params)) {
-                $rps = $r->getParameters();
                 $newparams = array();
                 foreach ($rps as $i => $rp) {
                     /* @var \ReflectionParameter $rp */
@@ -149,6 +150,17 @@ class JsonRpcController extends ContainerAware
                 $params = $newparams;
             }
 
+            // correctly deserialize object parameters
+            foreach ($params as $index => $param) {
+                // if the json_decode'd param value is an array but an object is expected as method parameter,
+                // re-encode the array value to json and correctly decode it using jsm_serializer
+                if (is_array($param) && !$rps[$index]->isArray() && $rps[$index]->getClass() != null) {
+                    $class = $rps[$index]->getClass()->getName();
+                    $param = json_encode($param);
+                    $params[$index] = $this->container->get('jms_serializer')->deserialize($param, $class, 'json');
+                }
+            }
+
             try {
                 $result = call_user_func_array(array($service, $method), $params);
             } catch (\Exception $e) {
@@ -160,7 +172,12 @@ class JsonRpcController extends ContainerAware
             $response['id'] = $requestId;
 
             if ($this->container->has('jms_serializer')) {
-                $serializationContext = $this->getSerializationContext($this->functions[$request['method']]);
+                $functionConfig = (
+                    isset($this->functions[$request['method']])
+                        ? $this->functions[$request['method']]
+                        : array()
+                );
+                $serializationContext = $this->getSerializationContext($functionConfig);
                 $response = $this->container->get('jms_serializer')->serialize($response, 'json', $serializationContext);
             } else {
                 $response = json_encode($response);
