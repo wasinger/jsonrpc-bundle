@@ -76,7 +76,7 @@ That's why *JMSSerializerBundle is now a required dependency*.
 For this to work, the following conditions must be met:
 
 - The method parameters must be correctly type hinted
-- The classes used as parameters must contain `jms\_serializer ``@Type`` annotations for their properties <http://jmsyst.com/libs/serializer/master/reference/annotations#type>`_
+- The classes used as parameters must contain `jms\_serializer @Type annotations for their properties <http://jmsyst.com/libs/serializer/master/reference/annotations#type>`_
 
 Testing
 -------
