@@ -1,3 +1,10 @@
+### v0.5.0 2014-12-17 ###
+-   It is now possible to call methods that require objects as parameters (in previous versions only methods with scalar
+    and array parameters could be called). That's why JMSSerializerBundle is now a required dependency.
+    For this to work, the following conditions must be met:
+    - The method parameters must be correctly type hinted
+    - The parameter classes must contain [jms_serializer `@Type` annotations for its properties](http://jmsyst.com/libs/serializer/master/reference/annotations#type)
+
 ### v0.4.4 2014-11-28 ###
 -   The test service is no longer registered automatically. If you want to use it,
     you must define it in the config.yml of your application, see updated [Resources/doc/index.rst](Resources/doc/index.rst).

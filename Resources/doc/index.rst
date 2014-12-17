@@ -3,7 +3,7 @@ JsonRpcBundle
 
 JsonRpcBundle is a bundle for Symfony 2.3 and up that allows to easily build a JSON-RPC server for web services using `JSON-RPC 2.0`_.
 
-The bundle contains a controller that is able to expose methods of any service registered in the Symfony service container as a JSON-RPC web service. The return value of the service method is converted to JSON using `jms\_serializer`_, if this service is available, and json\_encode() otherwise.
+The bundle contains a controller that is able to expose methods of any service registered in the Symfony service container as a JSON-RPC web service. The return value of the service method is converted to JSON using `jms\_serializer`_.
 
 Of course, it doesn't simply expose all your services' methods to the public, but only those explicitely mentioned in the configuration. And service methods cannot be called by it's original name but by an alias to be defined in the configuration.
 
@@ -66,9 +66,17 @@ If you use `jms\_serializer`_ you can also configure exclusion strategies (group
                     version: "1"
                     max_depth_checks: true
 
-Starting with v0.4.0, it is also possible to fully expose all methods of a service by tagging it with 'wa72\_jsonrpc.exposable'.
+Starting with v0.4.0, it is also possible to fully expose all methods of a service by tagging it with ``wa72\_jsonrpc.exposable``.
 All public methods of services tagged with 'wa72\_jsonrpc.exposable' can be called via JSON-RPC. The method name
 to be used in the RPC call is "service\:method", i.e. the name of the service and the method separated by colon.
+
+**New in Version 0.5.0**: It is now possible to call methods that require objects as parameters (in previous versions
+only methods with scalar and array parameters could be called).
+That's why *JMSSerializerBundle is now a required dependency*.
+For this to work, the following conditions must be met:
+
+- The method parameters must be correctly type hinted
+- The classes used as parameters must contain `jms_serializer ``@Type`` annotations for their properties <http://jmsyst.com/libs/serializer/master/reference/annotations#type>`_
 
 Testing
 -------
