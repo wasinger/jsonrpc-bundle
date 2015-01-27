@@ -164,7 +164,7 @@ class JsonRpcController extends ContainerAware
             try {
                 $result = call_user_func_array(array($service, $method), $params);
             } catch (\Exception $e) {
-                return $this->getErrorResponse(self::INTERNAL_ERROR, $requestId, $e->getMessage());
+                return $this->getErrorResponse(self::INTERNAL_ERROR, $requestId, $this->convertExceptionToErrorData($e));
             }
 
             $response = array('jsonrpc' => '2.0');
@@ -230,6 +230,11 @@ class JsonRpcController extends ContainerAware
         if (isset($this->functions[$alias])) {
             unset($this->functions[$alias]);
         }
+    }
+
+    protected function convertExceptionToErrorData(\Exception $e)
+    {
+        return $e->getMessage();
     }
 
     protected function getError($code)
