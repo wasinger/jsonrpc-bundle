@@ -1,3 +1,4 @@
 wa72_json_rpc:
-    pattern: /
-    defaults: { _controller: wa72_jsonrpc.jsonrpccontroller:execute }
+    pattern: "{optionalTrailingSlash}"
+    defaults: { _controller: wa72_jsonrpc.jsonrpccontroller:execute, optionalTrailingSlash : "/" }
+    requirements: { optionalTrailingSlash : "[/]{0,1}" }
