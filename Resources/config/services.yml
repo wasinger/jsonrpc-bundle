@@ -4,4 +4,4 @@ parameters:
 services:
     wa72_jsonrpc.jsonrpccontroller:
         class: %wa72_jsonrpc.jsonrpccontroller.class%
-        arguments: [@service_container, %wa72.jsonrpc%]
+        arguments: ['@service_container', %wa72.jsonrpc%]
