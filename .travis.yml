@@ -21,5 +21,9 @@ matrix:
   exclude:
     - env: SYMFONY_VERSION=dev-master
       php: 5.4
+    - env: SYMFONY_VERSION=dev-master
+      php: 5.5
     - env: SYMFONY_VERSION=3.2.*
       php: 5.4
+    - env: SYMFONY_VERSION=3.2.*
+      php: 5.5
