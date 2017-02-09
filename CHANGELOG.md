@@ -1,3 +1,8 @@
+
+### master ###
+-   add compatibility with Symfony 3
+-   minimum required Symfony version is now 2.7
+
 ### v0.5.0 2014-12-17 ###
 -   It is now possible to call methods that require objects as parameters (in previous versions only methods with scalar
     and array parameters could be called). That's why JMSSerializerBundle is now a required dependency.

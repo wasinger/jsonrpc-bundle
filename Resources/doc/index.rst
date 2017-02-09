@@ -1,7 +1,7 @@
 JsonRpcBundle
 =============
 
-JsonRpcBundle is a bundle for Symfony 2.3 and up that allows to easily build a JSON-RPC server for web services using `JSON-RPC 2.0`_.
+JsonRpcBundle is a bundle for Symfony 2.7 and up that allows to easily build a JSON-RPC server for web services using `JSON-RPC 2.0`_.
 
 The bundle contains a controller that is able to expose methods of any service registered in the Symfony service container as a JSON-RPC web service. The return value of the service method is converted to JSON using `jms\_serializer`_.
 
@@ -108,7 +108,7 @@ and you should get the following answer:
 There are also unit tests for phpunit. Just install the required dependencies using ``composer install`` and run
 ``phpunit`` in the root directory of the project.
 
-© 2014 Christoph Singer, Web-Agentur 72. Licensed under the MIT license.
+© 2013-2017 Christoph Singer, Web-Agentur 72. Licensed under the MIT license.
 
 
 .. _`JSON-RPC 2.0`: http://www.jsonrpc.org/specification
