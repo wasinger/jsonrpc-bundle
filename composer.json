@@ -13,8 +13,8 @@
         }
     ],
     "require":{
-        "php":">=5.4|>=7.1",
-        "symfony/symfony":"~2.7|~3.0|~4.0",
+        "php":">=5.4",
+        "symfony/symfony":"~2.7|~3.0|^4.0",
         "jms/serializer-bundle":"~1.1"
     },
     "autoload":{
