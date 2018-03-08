@@ -6,7 +6,9 @@ JsonRpcBundle
 [![Downloads from Packagist](http://img.shields.io/packagist/dt/wa72/jsonrpc-bundle.svg)](https://packagist.org/packages/wa72/jsonrpc-bundle)
 
 
-JsonRpcBundle is a bundle for Symfony 2.7 and up that allows to easily build a JSON-RPC server for web services using [JSON-RPC 2.0] (http://www.jsonrpc.org/specification).
+JsonRpcBundle is a bundle for Symfony 2 and 3 that allows to easily build a JSON-RPC server for web services using [JSON-RPC 2.0] (http://www.jsonrpc.org/specification).
+
+*Currently it does not work yet with Symfony 4.*
 
 The bundle contains a controller that is able to expose methods of any service registered in the Symfony service container as a JSON-RPC web service.
 
