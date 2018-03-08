@@ -9,7 +9,7 @@ use Wa72\JsonRpcBundle\Tests\Fixtures\Testparameter;
 
 require __DIR__ . '/Fixtures/app/Wa72JsonRpcBundleTestKernel.php';
 
-class JsonRpcControllerTest extends \PHPUnit_Framework_TestCase {
+class JsonRpcControllerTest extends \PHPUnit\Framework\TestCase {
     /**
      * @var \Wa72JsonRpcBundleTestKernel
      */

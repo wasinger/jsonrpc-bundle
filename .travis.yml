@@ -2,19 +2,20 @@ language: php
 
 php:
   - 5.4
-  - 5.5
   - 5.6
   - 7.0
-  - 7.1
+  - 7.2
 
 env:
   - SYMFONY_VERSION=2.8.*
-  - SYMFONY_VERSION=3.2.*
-  - SYMFONY_VERSION=4.0.*
+  - SYMFONY_VERSION=3.4.*
+  - SYMFONY_VERSION=^4
   - SYMFONY_VERSION=dev-master
 
 before_script:
   - composer require symfony/symfony:${SYMFONY_VERSION}
+
+script: vendor/bin/phpunit
 
 matrix:
   allow_failures:
@@ -23,14 +24,14 @@ matrix:
     - env: SYMFONY_VERSION=dev-master
       php: 5.4
     - env: SYMFONY_VERSION=dev-master
-      php: 5.5
-    - env: SYMFONY_VERSION=3.2.*
-      php: 5.4
-    - env: SYMFONY_VERSION=3.2.*
-      php: 5.5
-    - env: SYMFONY_VERSION=3.2.*
       php: 5.6
-    - env: SYMFONY_VERSION=3.2.*
+    - env: SYMFONY_VERSION=dev-master
       php: 7.0
-    - env: SYMFONY_VERSION=4.0.*
-      php: 7.1
+    - env: SYMFONY_VERSION=3.4.*
+      php: 5.4
+    - env: SYMFONY_VERSION=^4
+      php: 5.4
+    - env: SYMFONY_VERSION=^4
+      php: 5.6
+    - env: SYMFONY_VERSION=^4
+      php: 7.0
