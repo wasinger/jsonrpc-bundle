@@ -3,6 +3,7 @@ framework:
 services:
     wa72_jsonrpc.testservice:
         class: 'Wa72\JsonRpcBundle\Tests\Testservice'
+        public: true
         tags:
           - {name: wa72_jsonrpc.exposable}
     # override jms_serializer.form_error_handler with dummy
