@@ -1,3 +1,6 @@
+### v0.6.1 2018-03-10 ###
+-   compatibility with Symfony 4, thanks to @shreypuranik
+-   make unit tests compatible with newer phpunit versions
 
 ### v0.6.0 2017-02-09 ###
 -   added compatibility with Symfony 3, thanks to @JasonMiesionczek
