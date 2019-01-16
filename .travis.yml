@@ -1,7 +1,6 @@
 language: php
 
 php:
-  - 5.4
   - 5.6
   - 7.0
   - 7.2
@@ -13,7 +12,7 @@ env:
   - SYMFONY_VERSION=dev-master
 
 before_script:
-  - composer require symfony/symfony:${SYMFONY_VERSION}
+  - COMPOSER_MEMORY_LIMIT=-1 travis_retry composer require symfony/framework-bundle:${SYMFONY_VERSION} --prefer-dist --no-interaction
 
 script: vendor/bin/phpunit
 
@@ -22,15 +21,9 @@ matrix:
     - env: SYMFONY_VERSION=dev-master
   exclude:
     - env: SYMFONY_VERSION=dev-master
-      php: 5.4
-    - env: SYMFONY_VERSION=dev-master
       php: 5.6
     - env: SYMFONY_VERSION=dev-master
       php: 7.0
-    - env: SYMFONY_VERSION=3.4.*
-      php: 5.4
-    - env: SYMFONY_VERSION=^4
-      php: 5.4
     - env: SYMFONY_VERSION=^4
       php: 5.6
     - env: SYMFONY_VERSION=^4
