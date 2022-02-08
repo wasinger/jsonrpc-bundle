@@ -147,7 +147,7 @@ class JsonRpcController implements ContainerAwareInterface
                     if (isset($params[$rp->name])) {
                         $newparams[] = $params[$rp->name];
                     } else {
-                        $newparams[] = null;
+                        $newparams[] = $rp->isOptional() ? $rp->getDefaultValue() : null;
                     }
                 }
                 $params = $newparams;
