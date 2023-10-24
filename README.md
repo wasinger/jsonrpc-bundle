@@ -1,7 +1,7 @@
 JsonRpcBundle
 =============
 
-[![Build Status](https://secure.travis-ci.org/wasinger/jsonrpc-bundle.svg?branch=master)](http://travis-ci.org/wasinger/jsonrpc-bundle)
+![tests](https://github.com/wasinger/jsonrpc-bundle/actions/workflows/tests.yml/badge.svg?branch=master)
 [![Latest Version](http://img.shields.io/packagist/v/wa72/jsonrpc-bundle.svg)](https://packagist.org/packages/wa72/jsonrpc-bundle)
 [![Downloads from Packagist](http://img.shields.io/packagist/dt/wa72/jsonrpc-bundle.svg)](https://packagist.org/packages/wa72/jsonrpc-bundle)
 
@@ -18,4 +18,4 @@ Documentation
 Documentation is found in [Resources/doc/index.rst](Resources/doc/index.rst).
 
 
-© 2013-2018 Christoph Singer, Web-Agentur 72. Licensed under the MIT license.
+© 2013-2023 Christoph Singer. Licensed under the MIT license.

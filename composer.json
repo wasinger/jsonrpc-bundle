@@ -8,8 +8,7 @@
     "authors":[
         {
             "name":"Christoph Singer",
-            "email":"singer@webagentur72.de",
-            "homepage":"http://www.webagentur72.de"
+            "email":"dev@ccss.de"
         }
     ],
     "require":{
