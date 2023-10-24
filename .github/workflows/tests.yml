@@ -1,0 +1,35 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php: [7.4, 8.0, 8.1, 8.2]
+        dependency-version: [prefer-lowest, prefer-stable]
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: xdebug
+
+      - name: install dependencies
+        run: composer update --${{ matrix.dependency-version }}
+
+      - name: run tests
+        run: php vendor/bin/phpunit
