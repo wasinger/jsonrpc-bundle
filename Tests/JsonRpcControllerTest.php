@@ -20,7 +20,7 @@ class JsonRpcControllerTest extends \PHPUnit\Framework\TestCase {
      */
     private $controller;
 
-    public function setUp()
+    public function setUp(): void
     {
         $config = array(
             'functions' => array(
@@ -193,7 +193,7 @@ class JsonRpcControllerTest extends \PHPUnit\Framework\TestCase {
     /**
      * Shuts the kernel down if it was used in the test.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (null !== $this->kernel) {
             $this->kernel->shutdown();

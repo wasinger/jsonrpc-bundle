@@ -5,7 +5,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 
 class Wa72JsonRpcBundleTestKernel extends Kernel
 {
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return array(
             new JMS\SerializerBundle\JMSSerializerBundle(),
@@ -22,7 +22,7 @@ class Wa72JsonRpcBundleTestKernel extends Kernel
     /**
      * @return string
      */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return sys_get_temp_dir().'/Wa72JsonRpcBundle/cache';
     }
@@ -30,7 +30,7 @@ class Wa72JsonRpcBundleTestKernel extends Kernel
     /**
      * @return string
      */
-    public function getLogDir()
+    public function getLogDir(): string
     {
         return sys_get_temp_dir().'/Wa72JsonRpcBundle/logs';
     }
