@@ -1,3 +1,13 @@
+### v0.8.0 2025-07-26 ###
+-   Support for Symfony 7, minimum required Symfony version is now 5.4.
+-   JMS\SerializerBundle is no longer a required dependency, symfony/serializer can be used instead.
+-   Configuration changes:
+    - Use `serialization_context` instead of `jms_serialization_context`.
+    - Use `enable_max_depth' instead of `max_depth_checks`.
+
+### v0.7.0-beta 2023-10-24 ###
+-   Updated for Symfony 5 and 6 and PHP 8.
+
 ### v0.6.1 2018-03-10 ###
 -   compatibility with Symfony 4, thanks to @shreypuranik
 -   make unit tests compatible with newer phpunit versions
