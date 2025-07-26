@@ -2,11 +2,14 @@
 
 namespace Wa72\JsonRpcBundle\Controller;
 
+use JMS\Serializer\SerializationContext as JMS_SerializationContext;
+use JMS\Serializer\SerializerInterface as JMS_SerializerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * Controller for executing JSON-RPC 2.0 requests
@@ -42,9 +45,9 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
  * @author Christoph Singer
  *
  */
-class JsonRpcController implements ContainerAwareInterface
+class JsonRpcController
 {
-    use ContainerAwareTrait;
+    private ContainerInterface $container;
     
     const PARSE_ERROR = -32700;
     const INVALID_REQUEST = -32600;
@@ -54,46 +57,50 @@ class JsonRpcController implements ContainerAwareInterface
 
     /**
      * Functions that are allowed to be called
-     *
-     * @var array $functions
      */
-    private $functions = array();
+    private array $functions = [];
 
     /**
      * Array of names of fully exposed services (all methods of this services are allowed to be called)
-     *
-     * @var array $services
      */
-    private $services = array();
+    private array $services = [];
+
+
+    private JMS_SerializerInterface|SerializerInterface $serializer;
+
+
+    private JMS_SerializationContext|array $serializationContext = [];
 
     /**
-     * @var \JMS\Serializer\SerializationContext
-     */
-    private $serializationContext;
-
-    /**
-     * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+     * @param ContainerInterface $container
      * @param array $config Associative array for configuration, expects at least a key "functions"
      * @throws \InvalidArgumentException
      */
-    public function __construct($container, $config)
+    public function __construct(ContainerInterface $container, array $config)
     {
         if (isset($config['functions'])) {
             if (!is_array($config['functions'])) throw new \InvalidArgumentException('Configuration parameter "functions" must be array');
             $this->functions = $config['functions'];
         }
-        $this->setContainer($container);
+        $this->container = $container;
+        if ($this->container->has('jms_serializer')) {
+            $this->serializer = $this->container->get('jms_serializer');
+        } elseif ($this->container->has('wa72_jsonrpc.serializer')) {
+            $this->serializer = $this->container->get('wa72_jsonrpc.serializer');
+        } else {
+            throw new \InvalidArgumentException('No serializer service found in container. Please install jms/serializer-bundle or symfony/serializer.');
+        }
     }
 
     /**
      * @param Request $httprequest
      * @return Response
      */
-    public function execute(Request $httprequest)
+    public function execute(Request $httprequest): Response
     {
         $json = $httprequest->getContent();
         $request = json_decode($json, true);
-        $requestId = (isset($request['id']) ? $request['id'] : null);
+        $requestId = ($request['id'] ?? null);
 
         if ($request === null) {
             return $this->getErrorResponse(self::PARSE_ERROR, null);
@@ -119,9 +126,9 @@ class JsonRpcController implements ContainerAwareInterface
         } catch (ServiceNotFoundException $e) {
             return $this->getErrorResponse(self::METHOD_NOT_FOUND, $requestId);
         }
-        $params = (isset($request['params']) ? $request['params'] : array());
+        $params = ($request['params'] ?? []);
 
-        if (is_callable(array($service, $method))) {
+        if (is_callable([$service, $method])) {
             $r = new \ReflectionMethod($service, $method);
             $rps = $r->getParameters();
 
@@ -136,9 +143,8 @@ class JsonRpcController implements ContainerAwareInterface
 
             }
             if ($this->isAssoc($params)) {
-                $newparams = array();
+                $newparams = [];
                 foreach ($rps as $i => $rp) {
-                    /* @var \ReflectionParameter $rp */
                     $name = $rp->name;
                     if (!isset($params[$rp->name]) && !$rp->isOptional()) {
                         return $this->getErrorResponse(self::INVALID_PARAMS, $requestId,
@@ -156,37 +162,25 @@ class JsonRpcController implements ContainerAwareInterface
             // correctly deserialize object parameters
             foreach ($params as $index => $param) {
                 // if the json_decode'd param value is an array but an object is expected as method parameter,
-                // re-encode the array value to json and correctly decode it using jsm_serializer
+                // re-encode the array value to json and correctly decode it using the serializer.
+                //
+                // TODO: since PHP 8, the method type hints can include union types, so we need to handle those as well.
                 if (is_array($param) && !$rps[$index]->isArray() && $rps[$index]->getClass() != null) {
                     $class = $rps[$index]->getClass()->getName();
-                    $param = json_encode($param);
-                    $params[$index] = $this->container->get('jms_serializer')->deserialize($param, $class, 'json');
+                    $params[$index] = $this->deserialize(json_encode($param), $class);
                 }
             }
 
             try {
-                $result = call_user_func_array(array($service, $method), $params);
+                $result = call_user_func_array([$service, $method], $params);
             } catch (\Exception $e) {
                 return $this->getErrorResponse(self::INTERNAL_ERROR, $requestId, $this->convertExceptionToErrorData($e));
             }
-
-            $response = array('jsonrpc' => '2.0');
+            $response = ['jsonrpc' => '2.0'];
             $response['result'] = $result;
             $response['id'] = $requestId;
-
-            if ($this->container->has('jms_serializer')) {
-                $functionConfig = (
-                    isset($this->functions[$request['method']])
-                        ? $this->functions[$request['method']]
-                        : array()
-                );
-                $serializationContext = $this->getSerializationContext($functionConfig);
-                $response = $this->container->get('jms_serializer')->serialize($response, 'json', $serializationContext);
-            } else {
-                $response = json_encode($response);
-            }
-
-            return new Response($response, 200, array('Content-Type' => 'application/json'));
+            $response = $this->serialize($response, $request['method']);
+            return JsonResponse::fromJsonString($response);
         } else {
             return $this->getErrorResponse(self::METHOD_NOT_FOUND, $requestId);
         }
@@ -203,14 +197,13 @@ class JsonRpcController implements ContainerAwareInterface
      */
     public function addMethod($alias, $service, $method, $overwrite = false)
     {
-        if (!isset($this->functions)) $this->functions = array();
         if (isset($this->functions[$alias]) && !$overwrite) {
             throw new \InvalidArgumentException('JsonRpcController: The function "' . $alias . '" already exists.');
         }
-        $this->functions[$alias] = array(
+        $this->functions[$alias] = [
             'service' => $service,
             'method' => $method
-        );
+        ];
     }
 
     /**
@@ -235,12 +228,12 @@ class JsonRpcController implements ContainerAwareInterface
         }
     }
 
-    protected function convertExceptionToErrorData(\Exception $e)
+    protected function convertExceptionToErrorData(\Exception $e): string
     {
         return $e->getMessage();
     }
 
-    protected function getError($code)
+    protected function getError($code): array
     {
         $message = '';
         switch ($code) {
@@ -264,7 +257,7 @@ class JsonRpcController implements ContainerAwareInterface
         return array('code' => $code, 'message' => $message);
     }
 
-    protected function getErrorResponse($code, $id, $data = null)
+    protected function getErrorResponse($code, $id, $data = null): JsonResponse
     {
         $response = array('jsonrpc' => '2.0');
         $response['error'] = $this->getError($code);
@@ -275,46 +268,82 @@ class JsonRpcController implements ContainerAwareInterface
 
         $response['id'] = $id;
 
-        return new Response(json_encode($response), 200, array('Content-Type' => 'application/json'));
+        return new JsonResponse($response);
     }
 
     /**
-     * Set SerializationContext for using with jms_serializer
-     *
-     * @param \JMS\Serializer\SerializationContext $context
+     * Serialize the return value of a method call to JSON.
      */
-    public function setSerializationContext($context)
+    protected function serialize(mixed $data, string $rpc_method): string
     {
+        return $this->serializer->serialize($data, 'json', $this->getSerializationContext($rpc_method));
+    }
+
+    /**
+     * Deserialize parameter values coming with the RPC request to the expected type.
+     */
+    protected function deserialize(string $json, string $class): mixed
+    {
+        return $this->serializer->deserialize($json, $class, 'json');
+    }
+
+    /**
+     * Set SerializationContext
+     *
+     */
+    public function setSerializationContext(array|JMS_SerializationContext $context): void
+    {
+        if ($this->serializer instanceof JMS_SerializerInterface && !($context instanceof JMS_SerializationContext)) {
+            throw new \InvalidArgumentException('If jms_serializer is used, the SerializationContext must be an instance of JMS_SerializationContext');
+        }
+        if ($this->serializer instanceof SerializerInterface && !is_array($context)) {
+            throw new \InvalidArgumentException('If symfony/serializer is used, the SerializationContext must be an array');
+        }
         $this->serializationContext = $context;
     }
 
     /**
-     * Get SerializationContext or creates one if jms_serialization_context option is set
+     * Get SerializationContext for a given rpc_method.
      *
-     * @param array $functionConfig
-     * @return \JMS\Serializer\SerializationContext
+     * The context will be created from the configuration array for this method if available,
+     * otherwise the default serialization context (set by $this->setSerializationContext()) will be used.
      */
-    protected function getSerializationContext(array $functionConfig)
+    protected function getSerializationContext(string $rpc_method): JMS_SerializationContext|array
     {
-        if (isset($functionConfig['jms_serialization_context'])) {
-            $serializationContext = \JMS\Serializer\SerializationContext::create();
-
-            if (isset($functionConfig['jms_serialization_context']['groups'])) {
-                $serializationContext->setGroups($functionConfig['jms_serialization_context']['groups']);
+        $functionConfig = $this->functions[$rpc_method] ?? [];
+        if ($this->serializer instanceof JMS_SerializerInterface) {
+            // legacy support for jms_serialization_context
+            if (isset($functionConfig['jms_serialization_context'])) {
+                $functionConfig['serialization_context'] = $functionConfig['jms_serialization_context'];
             }
-
-            if (isset($functionConfig['jms_serialization_context']['version'])) {
-                $serializationContext->setVersion($functionConfig['jms_serialization_context']['version']);
+            if (isset($functionConfig['serialization_context'])) {
+                $context = JMS_SerializationContext::create();
+                if (isset($functionConfig['serialization_context']['groups'])) {
+                    $context->setGroups($functionConfig['jms_serialization_context']['groups']);
+                }
+                if (isset($functionConfig['serialization_context']['version'])) {
+                    $context->setVersion($functionConfig['jms_serialization_context']['version']);
+                }
+                if (!empty($functionConfig['serialization_context']['max_depth_checks']) || !empty($functionConfig['serialization_context']['enable_max_depth'])) {
+                    $context->enableMaxDepthChecks();
+                }
+            } else {
+                if ($this->serializationContext instanceof JMS_SerializationContext) {
+                    $context = $this->serializationContext;
+                } else {
+                    $context = JMS_SerializationContext::create();
+                }
             }
-
-            if (isset($functionConfig['jms_serialization_context']['max_depth_checks'])) {
-                $serializationContext->enableMaxDepthChecks($functionConfig['jms_serialization_context']['max_depth_checks']);
+        } elseif ($this->serializer instanceof SerializerInterface) {
+            $context = $functionConfig['serialization_context'] ?? $this->serializationContext;
+            if (!empty($context['max_depth_checks'])) { // legacy support for max_depth_checks
+                $context['enable_max_depth'] = true;
             }
         } else {
-            $serializationContext = $this->serializationContext;
+            throw new \LogicException('No serializer service found in container. Please install jms/serializer-bundle or symfony/serializer.');
         }
 
-        return $serializationContext;
+        return $context;
     }
     
     /**

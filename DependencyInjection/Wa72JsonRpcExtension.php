@@ -4,8 +4,10 @@ namespace Wa72\JsonRpcBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
+use Wa72\JsonRpcBundle\Controller\JsonRpcController;
 
 /**
  * This is the class that loads and manages your bundle configuration

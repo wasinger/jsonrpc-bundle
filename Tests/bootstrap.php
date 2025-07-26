@@ -18,5 +18,5 @@ EOM;
  
 	exit(1);
 }
-\Doctrine\Common\Annotations\AnnotationRegistry::registerLoader('class_exists');
+
 

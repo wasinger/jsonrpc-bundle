@@ -4,63 +4,54 @@ namespace Wa72\JsonRpcBundle\Tests\Fixtures;
 use JMS\Serializer\Annotation\Type;
 
 class Testparameter {
-    /**
-     * @Type("string")
-     */
-    private $a;
-    /**
-     * @Type("string")
-     */
-    protected $b;
-    /**
-     * @Type("string")
-     */
-    public $c;
 
     /**
-     * @param string $a
+     * @Type("string")
      */
-    public function __construct($a)
+    private string $a;
+
+    /**
+     * @Type("string")
+     */
+    protected string $b;
+
+    /**
+     * @Type("string")
+     */
+    public string $c;
+
+
+    public function __construct(string $a)
     {
         $this->a = $a;
     }
 
-    /**
-     * @return string
-     */
-    public function getA()
+
+    public function getA(): string
     {
         return $this->a;
     }
 
-    /**
-     * @return string
-     */
-    public function getB()
+
+    public function getB(): string
     {
         return $this->b;
     }
 
-    /**
-     * @param string $b
-     */
-    public function setB($b)
+
+    public function setB(string $b)
     {
         $this->b = $b;
     }
 
-    /**
-     * @return string
-     */
-    public function getC()
+
+    public function getC(): string
     {
         return $this->c;
     }
 
-    /**
-     * @param string $c
-     */
-    public function setC($c)
+
+    public function setC(string $c)
     {
         $this->c = $c;
     }

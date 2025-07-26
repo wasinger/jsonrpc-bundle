@@ -1,37 +1,27 @@
 <?php
 namespace Wa72\JsonRpcBundle\Tests;
 
-use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Wa72\JsonRpcBundle\Controller\JsonRpcController;
 use Wa72\JsonRpcBundle\Tests\Fixtures\Testparameter;
 
-require __DIR__ . '/Fixtures/app/Wa72JsonRpcBundleTestKernel.php';
+require __DIR__ . '/Fixtures/app/Wa72JsonRpcBundleTestKernel1.php';
 
-class JsonRpcControllerTest extends \PHPUnit\Framework\TestCase {
-    /**
-     * @var \Wa72JsonRpcBundleTestKernel
-     */
-    private $kernel;
+/**
+ * Test for JsonRpcController with JMS Serializer Bundle
+ */
+class JsonRpcController1Test extends \PHPUnit\Framework\TestCase {
 
-    /**
-     * @var \Wa72\JsonRpcBundle\Controller\JsonRpcController
-     */
-    private $controller;
+    private \Wa72JsonRpcBundleTestKernel1 $kernel;
+
+    private JsonRpcController $controller;
 
     public function setUp(): void
     {
-        $config = array(
-            'functions' => array(
-                'testhello' => array(
-                    'service' => 'wa72_jsonrpc.testservice',
-                    'method' => 'hello'
-                )
-            )
-        );
-        $this->kernel = new \Wa72JsonRpcBundleTestKernel('test', false);
+        $this->kernel = new \Wa72JsonRpcBundleTestKernel1('test', false);
         $this->kernel->boot();
+        $container = $this->kernel->getContainer();
+        $config = $container->getParameter('wa72.jsonrpc');
         $this->controller = new JsonRpcController($this->kernel->getContainer(), $config);
     }
 
@@ -183,10 +173,16 @@ class JsonRpcControllerTest extends \PHPUnit\Framework\TestCase {
 
     private function makeRequest($controller, $requestdata)
     {
-        /** @var \JMS\Serializer\Serializer $serializer */
-        $serializer = $this->kernel->getContainer()->get('jms_serializer');
+        $container = $this->kernel->getContainer();
+        if ($container->has('jms_serializer')) {
+            $serializer = $container->get('jms_serializer');
+        } elseif ($container->has('serializer')) {
+            $serializer = $container->get('serializer');
+        } else {
+            $this->fail('No serializer service found in container.');
+        }
         return json_decode($controller->execute(
-            new Request(array(), array(), array(), array(), array(), array(), $serializer->serialize($requestdata, 'json'))
+            new Request([], [], [], [], [], [], $serializer->serialize($requestdata, 'json'))
         )->getContent(), true);
     }
 
@@ -195,9 +191,7 @@ class JsonRpcControllerTest extends \PHPUnit\Framework\TestCase {
      */
     protected function tearDown(): void
     {
-        if (null !== $this->kernel) {
-            $this->kernel->shutdown();
-        }
+        $this->kernel->shutdown();
     }
 
 }

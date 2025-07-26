@@ -24,7 +24,7 @@ class Testservice {
     {
         if (!is_array($arg1)) throw new \InvalidArgumentException('arg1 must be an array!');
         if (!is_object($arg2)) throw new \InvalidArgumentException('arg2 must be an object!');
-        if (!($arg3 instanceof Testparameter)) throw new \InvalidArgumentException('arg2 must be an object!');
+        if (!($arg3 instanceof Testparameter)) throw new \InvalidArgumentException('arg3 must be an object!');
         return $arg3->getA() . $arg3->getB() . $arg3->getC();
     }
 }

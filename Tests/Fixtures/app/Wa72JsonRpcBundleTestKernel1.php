@@ -3,18 +3,21 @@
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 
-class Wa72JsonRpcBundleTestKernel extends Kernel
+/**
+ * Kernel for testing with JMS Serializer Bundle
+ */
+class Wa72JsonRpcBundleTestKernel1 extends Kernel
 {
     public function registerBundles(): iterable
     {
         return array(
-            new JMS\SerializerBundle\JMSSerializerBundle(),
             new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
-            new Wa72\JsonRpcBundle\Wa72JsonRpcBundle()
+            new Wa72\JsonRpcBundle\Wa72JsonRpcBundle(),
+            new JMS\SerializerBundle\JMSSerializerBundle(),
         );
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(__DIR__.'/config/config.yml');
     }

@@ -1,21 +1,41 @@
-JsonRpcBundle
-=============
+![act-logo](https://raw.githubusercontent.com/wiki/nektos/act/img/logo-150.png)
 
-![tests](https://github.com/wasinger/jsonrpc-bundle/actions/workflows/tests.yml/badge.svg?branch=master)
-[![Latest Version](http://img.shields.io/packagist/v/wa72/jsonrpc-bundle.svg)](https://packagist.org/packages/wa72/jsonrpc-bundle)
-[![Downloads from Packagist](http://img.shields.io/packagist/dt/wa72/jsonrpc-bundle.svg)](https://packagist.org/packages/wa72/jsonrpc-bundle)
+# Overview [![push](https://github.com/nektos/act/workflows/push/badge.svg?branch=master&event=push)](https://github.com/nektos/act/actions) [![Go Report Card](https://goreportcard.com/badge/github.com/nektos/act)](https://goreportcard.com/report/github.com/nektos/act) [![awesome-runners](https://img.shields.io/badge/listed%20on-awesome--runners-blue.svg)](https://github.com/jonico/awesome-runners)
 
+> "Think globally, `act` locally"
 
-JsonRpcBundle is a bundle for Symfony that allows to easily build a JSON-RPC server for web services using 
-[JSON-RPC 2.0](http://www.jsonrpc.org/specification).
+Run your [GitHub Actions](https://developer.github.com/actions/) locally! Why would you want to do this? Two reasons:
 
-The bundle contains a controller that is able to expose methods of any public service registered in the Symfony service 
-container as a JSON-RPC web service.
+- **Fast Feedback** - Rather than having to commit/push every time you want to test out the changes you are making to your `.github/workflows/` files (or for any changes to embedded GitHub actions), you can use `act` to run the actions locally. The [environment variables](https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables#default-environment-variables) and [filesystem](https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners#filesystems-on-github-hosted-runners) are all configured to match what GitHub provides.
+- **Local Task Runner** - I love [make](<https://en.wikipedia.org/wiki/Make_(software)>). However, I also hate repeating myself. With `act`, you can use the GitHub Actions defined in your `.github/workflows/` to replace your `Makefile`!
 
-Documentation
--------------
+> [!TIP]
+> **Now Manage and Run Act Directly From VS Code!**<br/>
+> Check out the [GitHub Local Actions](https://sanjulaganepola.github.io/github-local-actions-docs/) Visual Studio Code extension which allows you to leverage the power of `act` to run and test workflows locally without leaving your editor.
 
-Documentation is found in [Resources/doc/index.rst](Resources/doc/index.rst).
+# How Does It Work?
 
+When you run `act` it reads in your GitHub Actions from `.github/workflows/` and determines the set of actions that need to be run. It uses the Docker API to either pull or build the necessary images, as defined in your workflow files and finally determines the execution path based on the dependencies that were defined. Once it has the execution path, it then uses the Docker API to run containers for each action based on the images prepared earlier. The [environment variables](https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables#default-environment-variables) and [filesystem](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#file-systems) are all configured to match what GitHub provides.
 
-© 2013-2023 Christoph Singer. Licensed under the MIT license.
+Let's see it in action with a [sample repo](https://github.com/cplee/github-actions-demo)!
+
+![Demo](https://raw.githubusercontent.com/wiki/nektos/act/quickstart/act-quickstart-2.gif)
+
+# Act User Guide
+
+Please look at the [act user guide](https://nektosact.com) for more documentation.
+
+# Support
+
+Need help? Ask in [discussions](https://github.com/nektos/act/discussions)!
+
+# Contributing
+
+Want to contribute to act? Awesome! Check out the [contributing guidelines](CONTRIBUTING.md) to get involved.
+
+## Manually building from source
+
+- Install Go tools 1.20+ - (<https://golang.org/doc/install>)
+- Clone this repo `git clone git@github.com:nektos/act.git`
+- Run unit tests with `make test`
+- Build and install: `make install`

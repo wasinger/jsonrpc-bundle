@@ -6,3 +6,4 @@ services:
         public: true
         class: '%wa72_jsonrpc.jsonrpccontroller.class%'
         arguments: ['@service_container', '%wa72.jsonrpc%']
+
