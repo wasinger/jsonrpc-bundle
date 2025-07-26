@@ -19,14 +19,13 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9",
-        "doctrine/annotations": "^1.11",
-        "jms/serializer-bundle": "^3|^4|^5",
+        "jms/serializer-bundle": "^5.4",
         "symfony/property-access": "^5.4|^6.0|^7.0",
         "symfony/property-info": "^5.4|^6.0|^7.0",
         "symfony/serializer": "^5.4|^6.0|^7.0"
     },
     "suggest": {
-        "jms/serializer": "If you want to use JMS Serializer for serialization/deserialization",
+        "jms/serializer-bundle": "If you want to use JMS Serializer for serialization/deserialization",
         "symfony/serializer": "For using Symfony's Serializer component"
     },
     "autoload":{
