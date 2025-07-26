@@ -17,6 +17,8 @@ jobs:
       matrix:
         php: [8.0, 8.1, 8.2, 8.3, 8.4]
         dependency-version: [prefer-lowest, prefer-stable]
+        optional-deps: [without-jms, without-serializer, with-both]
+    name: PHP ${{ matrix.php }} - ${{ matrix.dependency-version }} - ${{ matrix.optional-deps }}
 
     steps:
       - name: checkout code
@@ -28,8 +30,30 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: xdebug
 
+      - name: get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ matrix.dependency-version }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-${{ matrix.php }}-${{ matrix.dependency-version }}-
+            ${{ runner.os }}-composer-${{ matrix.php }}-
+            ${{ runner.os }}-composer-
+
       - name: install dependencies
-        run: composer update --${{ matrix.dependency-version }}
+        run: composer update --${{ matrix.dependency-version }} --no-progress --no-interaction
+
+      - name: remove optional dependency (jms/serializer-bundle)
+        if: matrix.optional-deps == 'without-jms'
+        run: composer remove jms/serializer-bundle --dev --no-progress --no-interaction
+
+      - name: remove optional dependency (symfony/serializer)
+        if: matrix.optional-deps == 'without-serializer'
+        run: composer remove symfony/serializer --dev --no-progress --no-interaction
 
       - name: run tests
         run: php vendor/bin/phpunit

@@ -1,7 +1,5 @@
 framework:
   secret: dummy
-  serializer:
-    enabled: true
   property_access:
     enabled: true
 

@@ -28,12 +28,13 @@ class JsonRpcController1Test extends \PHPUnit\Framework\TestCase {
             } else {
                 $this->fail('No serializer available. Please install JMS Serializer Bundle or Symfony Serializer.');
             }
+        } else {
+            $this->kernel = new \Wa72JsonRpcBundleTestKernel1('test', false);
+            $this->kernel->boot();
+            $container = $this->kernel->getContainer();
+            $this->serializer = $container->get('jms_serializer');
+            $this->controller = $container->get('wa72_jsonrpc.jsonrpccontroller');
         }
-        $this->kernel = new \Wa72JsonRpcBundleTestKernel1('test', false);
-        $this->kernel->boot();
-        $container = $this->kernel->getContainer();
-        $this->serializer = $container->get('jms_serializer');
-        $this->controller = $container->get('wa72_jsonrpc.jsonrpccontroller');
     }
 
     public function testHello()
