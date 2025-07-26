@@ -1,6 +1,8 @@
 <?php
 namespace Wa72\JsonRpcBundle\Tests;
 
+use JMS\Serializer\SerializerInterface;
+use JMS\SerializerBundle\JMSSerializerBundle;
 use Symfony\Component\HttpFoundation\Request;
 use Wa72\JsonRpcBundle\Controller\JsonRpcController;
 use Wa72\JsonRpcBundle\Tests\Fixtures\Testparameter;
@@ -15,14 +17,23 @@ class JsonRpcController1Test extends \PHPUnit\Framework\TestCase {
     private \Wa72JsonRpcBundleTestKernel1 $kernel;
 
     private JsonRpcController $controller;
+    private SerializerInterface $serializer;
 
     public function setUp(): void
     {
+        if (!class_exists(JMSSerializerBundle::class)) {
+            if (interface_exists(\Symfony\Component\Serializer\SerializerInterface::class)) {
+                //
+                $this->markTestSkipped('JMS Serializer not available.');
+            } else {
+                $this->fail('No serializer available. Please install JMS Serializer Bundle or Symfony Serializer.');
+            }
+        }
         $this->kernel = new \Wa72JsonRpcBundleTestKernel1('test', false);
         $this->kernel->boot();
         $container = $this->kernel->getContainer();
-        $config = $container->getParameter('wa72.jsonrpc');
-        $this->controller = new JsonRpcController($this->kernel->getContainer(), $config);
+        $this->serializer = $container->get('jms_serializer');
+        $this->controller = $container->get('wa72_jsonrpc.jsonrpccontroller');
     }
 
     public function testHello()
